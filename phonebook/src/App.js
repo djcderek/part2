@@ -11,6 +11,10 @@ const App = () => {
     const personObject = {
       name: newName
     }
+    if (doesContain(persons, newName)) {
+      alert(`${newName} is already added to the phonebook`)
+      return
+    }
     setPersons(persons.concat(personObject))
     console.log(persons)
   }
@@ -18,6 +22,10 @@ const App = () => {
   const handlePersonChange = (event) => {
     console.log(event.target.value)
     setNewName(event.target.value)
+  }
+
+  const doesContain = (persons, person) => {
+    return persons.some(a => a.name === person)
   }
 
   return (
