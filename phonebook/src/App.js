@@ -5,6 +5,8 @@ import Form from './components/Form'
 import Display from './components/Display'
 import axios from 'axios'
 
+import personsService from './services/persons'
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [filteredPersons, setFilteredPersons] = useState(persons)
@@ -14,11 +16,15 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
 
   const hook = () => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      console.log(response.data)
-      setPersons(response.data)
-      setFilteredPersons(response.data)
-    })
+    personsService
+      .getAll()
+      .then(
+        response => {
+          console.log(response.data)
+          setPersons(response.data)
+          setFilteredPersons(response.data)
+        }
+    )
   }
 
   useEffect(hook, [])
@@ -42,7 +48,7 @@ const App = () => {
     setPersons(tempPersons.concat(personObject))
     setFilteredPersons(tempPersons.concat(personObject))
 
-    axios.post('http://localhost:3001/persons', personObject)
+    personsService.create(personObject)
   }
 
   const handlePersonChange = (event) => {
