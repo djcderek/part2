@@ -39,8 +39,22 @@ const App = () => {
       name: newName
     }
     if (doesContain(persons, newName)) {
-      alert(`${newName} is already added to the phonebook`)
-      return
+      if (!persons.some(a => a.number === newNumber)) {
+        if (window.confirm(`${newName} is already added. Would you like to change the phone number?`)) {
+          const tempPerson = persons.find(person => person.name === newName)
+          addNumber(tempPerson)
+          axios
+            .put(`http://localhost:3001/persons/${tempPerson.id}`, tempPerson)
+            .then(response => {
+              setPersons(persons.map(person => person.name === newName ? response.data : person))
+              setFilteredPersons(persons.map(person => person.name === newName ? response.data : person))
+            })
+        }
+        return
+      } else {
+        alert(`${newName} is already added to the phonebook`)
+        return
+      }
     }
 
     addNumber(personObject)
@@ -62,7 +76,7 @@ const App = () => {
   }
 
   const doesContain = (persons, person) => {
-    return persons.some(a => a.name === person)
+    return persons.some(a => a.name === person) 
   }
 
   const search = (event) => {
