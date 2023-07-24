@@ -29,6 +29,28 @@ const Notification = ({message}) => {
   )
 }
 
+const Error = ({message}) => {
+  const errorStyle = {
+    color: 'red',
+    fontSize: 20,
+    backgroundColor: 'lightgrey',
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='notification' style={errorStyle}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [filteredPersons, setFilteredPersons] = useState(persons)
@@ -37,6 +59,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const [addedNewPerson, setAddedNewPerson] = useState(null)
+  const [error, setError] = useState(null)
 
   const hook = () => {
     personsService
@@ -72,24 +95,30 @@ const App = () => {
               setPersons(persons.map(person => person.name === newName ? response.data : person))
               setFilteredPersons(persons.map(person => person.name === newName ? response.data : person))
             })
-            setAddedNewPerson(`Changed ${newName}'s number`)
-            setTimeout(() => setAddedNewPerson(null), 1500)
+            .catch(error => {
+              setError(`Information of ${newName} has already been removed from server`)
+              setTimeout(() => setError(null), 1500)
+            })
+          setAddedNewPerson(`Changed ${newName}'s number`)
+          setTimeout(() => setAddedNewPerson(null), 1500)
         }
         return
       } else {
         //alert(`${newName} is already added to the phonebook`)
-        setAddedNewPerson(`${newName} is already added to the phonebook`)
-        setTimeout(() => setAddedNewPerson(null), 1500)
+        setError(`${newName} is already added to the phonebook`)
+        setTimeout(() => setError(null), 1500)
         return
       }
     }
 
     addNumber(personObject)
 
-    personsService.create(personObject).then(response => {
-      setPersons(persons.concat(response.data))
-      setFilteredPersons(persons.concat(response.data))
-    })
+    personsService
+      .create(personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setFilteredPersons(persons.concat(response.data))
+      })
 
     setAddedNewPerson(`Added ${newName}`)
     setTimeout(() => setAddedNewPerson(null), 1500)
@@ -121,9 +150,9 @@ const App = () => {
   }
 
   const deletePerson = (id) => {
-    axios.get(`http://localhost:3001/persons/${id}`).then(response => {
-      console.log(response.data)
-    })
+    // axios.get(`http://localhost:3001/persons/${id}`).then(response => {
+    //   console.log(response.data)
+    // })
     axios
       .delete(`http://localhost:3001/persons/${id}`)
       .then(response => {
@@ -131,15 +160,27 @@ const App = () => {
           console.log(response.data)
           setPersons(response.data)
           setFilteredPersons(response.data)
+        })
       })
-      }
-      )
+      .catch(error => {
+        console.log('error caught')
+        const deletedPerson = persons.filter(person => person.id === id)
+        setError(`Information of ${deletedPerson.name} has already been removed from server`)
+        setTimeout(() => setError(null), 1500)
+      })
+
+      axios.get('http://localhost:3001/persons')
+      .then(response => {
+        setFilteredPersons(response.data)
+        setPersons(response.data)
+      })
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
       <Notification message={addedNewPerson}/>
+      <Error message={error}/>
       <Filter newFilter={newFilter} search={search}/>
       <h2>add a new</h2>
       <Form addPerson={addPerson} newName={newName} handlePersonChange={handlePersonChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
