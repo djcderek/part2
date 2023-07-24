@@ -7,6 +7,28 @@ import axios from 'axios'
 
 import personsService from './services/persons'
 
+const Notification = ({message}) => {
+  const notificationStyle = {
+    color: 'green',
+    fontSize: 20,
+    backgroundColor: 'lightgrey',
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='notification' style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [filteredPersons, setFilteredPersons] = useState(persons)
@@ -14,6 +36,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [addedNewPerson, setAddedNewPerson] = useState(null)
 
   const hook = () => {
     personsService
@@ -49,10 +72,14 @@ const App = () => {
               setPersons(persons.map(person => person.name === newName ? response.data : person))
               setFilteredPersons(persons.map(person => person.name === newName ? response.data : person))
             })
+            setAddedNewPerson(`Changed ${newName}'s number`)
+            setTimeout(() => setAddedNewPerson(null), 1500)
         }
         return
       } else {
-        alert(`${newName} is already added to the phonebook`)
+        //alert(`${newName} is already added to the phonebook`)
+        setAddedNewPerson(`${newName} is already added to the phonebook`)
+        setTimeout(() => setAddedNewPerson(null), 1500)
         return
       }
     }
@@ -63,6 +90,9 @@ const App = () => {
       setPersons(persons.concat(response.data))
       setFilteredPersons(persons.concat(response.data))
     })
+
+    setAddedNewPerson(`Added ${newName}`)
+    setTimeout(() => setAddedNewPerson(null), 1500)
   }
 
   const handlePersonChange = (event) => {
@@ -109,6 +139,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={addedNewPerson}/>
       <Filter newFilter={newFilter} search={search}/>
       <h2>add a new</h2>
       <Form addPerson={addPerson} newName={newName} handlePersonChange={handlePersonChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
