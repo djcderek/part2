@@ -44,11 +44,11 @@ const App = () => {
     }
 
     addNumber(personObject)
-    const tempPersons = [...persons]
-    setPersons(tempPersons.concat(personObject))
-    setFilteredPersons(tempPersons.concat(personObject))
 
-    personsService.create(personObject)
+    personsService.create(personObject).then(response => {
+      setPersons(persons.concat(response.data))
+      setFilteredPersons(persons.concat(response.data))
+    })
   }
 
   const handlePersonChange = (event) => {
@@ -76,6 +76,22 @@ const App = () => {
     setFilteredPersons(filteredPeople)
   }
 
+  const deletePerson = (id) => {
+    axios.get(`http://localhost:3001/persons/${id}`).then(response => {
+      console.log(response.data)
+    })
+    axios
+      .delete(`http://localhost:3001/persons/${id}`)
+      .then(response => {
+        personsService.getAll().then(response => {
+          console.log(response.data)
+          setPersons(response.data)
+          setFilteredPersons(response.data)
+      })
+      }
+      )
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -83,7 +99,7 @@ const App = () => {
       <h2>add a new</h2>
       <Form addPerson={addPerson} newName={newName} handlePersonChange={handlePersonChange} newNumber={newNumber} handleNumberChange={handleNumberChange}/>
       <h2>Numbers</h2>
-      <Display filteredPersons = {filteredPersons}/>
+      <Display filteredPersons = {filteredPersons} deletePerson={deletePerson}/>
     </div>
   )
 }
