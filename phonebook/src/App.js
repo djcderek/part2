@@ -41,6 +41,8 @@ const App = () => {
     const tempPersons = [...persons]
     setPersons(tempPersons.concat(personObject))
     setFilteredPersons(tempPersons.concat(personObject))
+
+    axios.post('http://localhost:3001/persons', personObject)
   }
 
   const handlePersonChange = (event) => {
