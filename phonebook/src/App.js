@@ -1,55 +1,15 @@
 import { useState } from 'react'
 import { useEffect} from 'react'
+
 import Filter from './components/Filter'
 import Form from './components/Form'
 import Display from './components/Display'
+import Notification from './components/Notification'
+import Error from './components/Error'
+
 import axios from 'axios'
 
 import personsService from './services/persons'
-
-const Notification = ({message}) => {
-  const notificationStyle = {
-    color: 'green',
-    fontSize: 20,
-    backgroundColor: 'lightgrey',
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10
-  }
-
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className='notification' style={notificationStyle}>
-      {message}
-    </div>
-  )
-}
-
-const Error = ({message}) => {
-  const errorStyle = {
-    color: 'red',
-    fontSize: 20,
-    backgroundColor: 'lightgrey',
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10
-  }
-
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className='notification' style={errorStyle}>
-      {message}
-    </div>
-  )
-}
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
