@@ -2,6 +2,12 @@ import { useState } from "react"
 import { useEffect } from "react"
 import axios from 'axios'
 
+const Show = (props) => {
+  return (
+    <button onClick={() => props.showCountry(props.country)}>show</button>
+  )
+}
+
 const Display = ({displayData}) => {
   if (displayData === null) {
     return null
@@ -65,12 +71,18 @@ function App() {
     }
   }
 
+  const showCountry = (country) => {
+    setDisplayData(country)
+  }
+
   return (
     <div>
       find countries
       <input onChange={searchCountry}></input>
       {newCountries.map(country => {
-        return <div key={country.name.common}>{country.name.common}</div>
+        return (<div key={country.name.common}>{country.name.common}
+        <Show country={country} showCountry={showCountry}/>
+        </div>)
       })}
       <div>{tooMany}</div>
       <Display displayData={displayData}/>
