@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useEffect } from "react"
 import axios from 'axios'
+import {Buffer} from 'buffer'
 
 const Show = (props) => {
   return (
@@ -29,6 +30,10 @@ const Display = ({displayData}) => {
         })}
       </div>
       <div style={flagStyle}>{displayData.flag}</div>
+      <h2>Weather in {displayData.capital}</h2>
+      <div>Temp is {(displayData.temp - 273.15).toFixed(2)} celsius</div>
+      <img src={displayData.image}></img>
+      <div>Wind speed is {displayData.windSpeed} m/s</div>
     </div>
   )
 }
@@ -38,6 +43,8 @@ function App() {
   const [tooMany, setTooMany] = useState(null)
   const [allCountries, setAllCountries] = useState([])
   const [displayData, setDisplayData] = useState(null)
+
+  const api_key = process.env.REACT_APP_API_KEY
 
   useEffect(() => {
     axios
@@ -60,7 +67,30 @@ function App() {
         setNewCountries(tempCountries)
         setDisplayData(null)
         if (tempCountries.length === 1) {
-          setDisplayData(tempCountries[0])
+          const lat = tempCountries[0].capitalInfo.latlng[0]
+          const lng = tempCountries[0].capitalInfo.latlng[1]
+          let weatherData
+          axios
+            .get(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lng}&appid=${api_key}`)
+            .then(response => {
+              console.log(response.data)
+              weatherData = response.data
+              console.log('temp:', weatherData.current.temp)
+              return weatherData
+            })
+            .then(response => {
+              setDisplayData({...tempCountries[0], temp: response.current.temp})
+              const icon = response.current.weather[0].icon
+              axios
+                .get(`https://openweathermap.org/img/wn/${icon}@2x.png`, {
+                  responseType: 'arraybuffer'})
+                .then(raw => {
+                  const base64 = Buffer.from(raw.data, 'binary').toString('base64')
+                  let image = `data:${raw.headers["content-type"]};base64,${base64}`
+                  console.log('displayData is', displayData)
+                  setDisplayData({...tempCountries[0], temp: response.current.temp, image: image, windSpeed: response.current.wind_speed})
+                })
+            })
           setNewCountries([])
           console.log('set DisplayData')
         }
@@ -72,7 +102,31 @@ function App() {
   }
 
   const showCountry = (country) => {
-    setDisplayData(country)
+    const lat = country.capitalInfo.latlng[0]
+    const lng = country.capitalInfo.latlng[1]
+    let weatherData
+    axios
+      .get(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lng}&appid=${api_key}`)
+      .then(response => {
+        console.log(response.data)
+        weatherData = response.data
+        console.log('temp:', weatherData.current.temp)
+        return weatherData
+      })
+      .then(response => {
+        setDisplayData({...country, temp: response.current.temp})
+        const icon = response.current.weather[0].icon
+        axios
+          .get(`https://openweathermap.org/img/wn/${icon}@2x.png`, {
+            responseType: 'arraybuffer'})
+          .then(raw => {
+            const base64 = Buffer.from(raw.data, 'binary').toString('base64')
+            let image = `data:${raw.headers["content-type"]};base64,${base64}`
+            console.log('displayData is', displayData)
+            setDisplayData({...country, temp: response.current.temp, image: image, windSpeed: response.current.wind_speed})
+          })
+      })
+    //setDisplayData(country)
   }
 
   return (
