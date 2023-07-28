@@ -110,30 +110,48 @@ const App = () => {
   }
 
   const deletePerson = (id) => {
-    // axios.get(`http://localhost:3001/persons/${id}`).then(response => {
-    //   console.log(response.data)
-    // })
-    axios
-      .delete(`http://localhost:3001/persons/${id}`)
-      .then(response => {
-        personsService.getAll().then(response => {
-          console.log(response.data)
-          setPersons(response.data)
-          setFilteredPersons(response.data)
-        })
-      })
-      .catch(error => {
-        console.log('error caught')
-        const deletedPerson = persons.filter(person => person.id === id)
-        setError(`Information of ${deletedPerson.name} has already been removed from server`)
-        setTimeout(() => setError(null), 1500)
-      })
-
-      axios.get('http://localhost:3001/persons')
-      .then(response => {
-        setFilteredPersons(response.data)
+    personsService.deletePerson(id).then(response => {
+      personsService.getAll().then(response => {
+        console.log(response.data)
         setPersons(response.data)
+        setFilteredPersons(response.data)
       })
+    })
+    .catch(error => {
+      console.log('error caught')
+      const deletedPerson = persons.filter(person => person.id === id)
+      setError(`Information of ${deletedPerson.name} has already been removed from server`)
+      setTimeout(() => setError(null), 1500)
+    })
+
+    // axios
+    //   .delete(`http://localhost:3001/persons/${id}`)
+    //   .then(response => {
+    //     personsService.getAll().then(response => {
+    //       console.log(response.data)
+    //       setPersons(response.data)
+    //       setFilteredPersons(response.data)
+    //     })
+    //   })
+    //   .catch(error => {
+    //     console.log('error caught')
+    //     const deletedPerson = persons.filter(person => person.id === id)
+    //     setError(`Information of ${deletedPerson.name} has already been removed from server`)
+    //     setTimeout(() => setError(null), 1500)
+    //   })
+
+      personsService
+        .getAll()
+        .then(response => {
+          setFilteredPersons(response.data)
+          setPersons(response.data)
+        })
+        
+      // axios.get('http://localhost:3001/persons')
+      // .then(response => {
+      //   setFilteredPersons(response.data)
+      //   setPersons(response.data)
+      // })
   }
 
   return (
