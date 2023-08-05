@@ -49,9 +49,9 @@ const App = () => {
         if (window.confirm(`${newName} is already added. Would you like to change the phone number?`)) {
           const tempPerson = persons.find(person => person.name === newName)
           addNumber(tempPerson)
-          axios
-            .put(`http://localhost:3001/persons/${tempPerson.id}`, tempPerson)
+          personsService.updatePerson(tempPerson.id, tempPerson)
             .then(response => {
+              console.log(response.data)
               setPersons(persons.map(person => person.name === newName ? response.data : person))
               setFilteredPersons(persons.map(person => person.name === newName ? response.data : person))
             })
@@ -124,34 +124,12 @@ const App = () => {
       setTimeout(() => setError(null), 1500)
     })
 
-    // axios
-    //   .delete(`http://localhost:3001/persons/${id}`)
-    //   .then(response => {
-    //     personsService.getAll().then(response => {
-    //       console.log(response.data)
-    //       setPersons(response.data)
-    //       setFilteredPersons(response.data)
-    //     })
-    //   })
-    //   .catch(error => {
-    //     console.log('error caught')
-    //     const deletedPerson = persons.filter(person => person.id === id)
-    //     setError(`Information of ${deletedPerson.name} has already been removed from server`)
-    //     setTimeout(() => setError(null), 1500)
-    //   })
-
       personsService
         .getAll()
         .then(response => {
           setFilteredPersons(response.data)
           setPersons(response.data)
         })
-        
-      // axios.get('http://localhost:3001/persons')
-      // .then(response => {
-      //   setFilteredPersons(response.data)
-      //   setPersons(response.data)
-      // })
   }
 
   return (
