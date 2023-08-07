@@ -78,10 +78,14 @@ const App = () => {
       .then(response => {
         setPersons(persons.concat(response.data))
         setFilteredPersons(persons.concat(response.data))
+        setAddedNewPerson(`Added ${newName}`)
+        setTimeout(() => setAddedNewPerson(null), 1500)
       })
-
-    setAddedNewPerson(`Added ${newName}`)
-    setTimeout(() => setAddedNewPerson(null), 1500)
+      .catch( error => {
+        console.log(error.response.data.error);
+        setError(error.response.data.error)
+        setTimeout(() => setError(null), 1500)
+      })
   }
 
   const handlePersonChange = (event) => {
